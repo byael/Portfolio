@@ -10,8 +10,8 @@ bandit0
 ```
 
 level 1
-`$ ssh bandit1@bandit.labs.overthewire.org -p 2220`
-`boJ9jbbUNNfktd78OOpsqOltutMc3MY1`
+```$ ssh bandit1@bandit.labs.overthewire.org -p 2220```
+password: `boJ9jbbUNNfktd78OOpsqOltutMc3MY1`
 
 level 2
-`CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9`
+password: `CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9`
