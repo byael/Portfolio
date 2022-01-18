@@ -221,15 +221,13 @@ MIIE[...]/ujbjY=
 
 closed
 ```
-Armed witht the key, we create a file with it to feed it to `ssh`
-
-:bangbang:
+Armed with the key, we create a file with it to feed it to `ssh`
 
 ``` bash
 bandit16@bandit:~$ vim /tmp/toerase/sshkey
 bandit16@bandit:/tmp/toerase$ ssh -i sshkey bandit17@localhost
 Could not create directory '/home/bandit16/.ssh'.
-The authenticity of host 'localhost (127.0.0.1)' can't be established.
+The authenticity of host 'localhost (127.0.0.1)' cannot be established.
 ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
 Are you sure you want to continue connecting (yes/no)? yes
 Failed to add the host to the list of known hosts (/home/bandit16/.ssh/known_hosts).
@@ -289,7 +287,7 @@ GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 ```
 password: `GbKksEFF4yrVs6il55v6gwY5aVje5f0j`
 
-#### level 21
+#### level 21 :bangbang:
 First execute the new program
 ``` bash
 bandit20@bandit:~$ ./suconnect
@@ -328,9 +326,9 @@ bandit20@bandit:~$ ./suconnect 4000
 Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 Password matches, sending next password
 ```
-The password is then returned in tab 1: gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
+The password is then returned in tab 1: `gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr`
 
-#### level 22
+#### level 22 :bangbang:
 ```
 bandit21@bandit:/etc/cron.d$ ls -la
 total 36
@@ -370,4 +368,143 @@ bandit21@bandit:/etc/cron.d$ less /usr/bin/cronjob_bandit22.sh
 bandit21@bandit:/etc/cron.d$ less /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
 ```
 
-Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
+password: `Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI`
+
+#### level 23
+Opening the relevant files gives us (similar with `bandit23`)
+```bash
+bandit22@bandit:/etc/cron.d$ cat cronjob_bandit22
+@reboot bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+```
+which means that script `/usr/bin/cronjob_bandit22.sh` is executed and outputting  to `/dev/null`. That last file is empty so let's investigate the script being executed.
+
+``` bash
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+```
+Since we are logged in as `bandit22` that is what `myname` is. Since the password we are looking for is being copied to `/tmp/$mytarget`, let's find out what that target is exactly and use that information to retrieve it, but as `bandit23`
+``` bash
+bandit22@bandit:/usr/bin$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@bandit:/usr/bin$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
+```
+
+password: `jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n`
+
+#### level 24
+We can completely bypass this one by just repeating what we did in the previous level
+``` bash
+bandit23@bandit:/var/spool$ echo I am user bandit24 | md5sum | cut -d ' ' -f 1
+ee4ee1703b083edac9f8183e4ae70293
+bandit23@bandit:/var/spool$ cat /tmp/ee4ee1703b083edac9f8183e4ae70293
+UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
+```
+password: `UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ`
+
+#### level 25
+Let's first check what happens if we just communicate with that port
+``` bash
+bandit24@bandit:~$ telnet localhost 30002
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+I am the pincode checker for user bandit25. Please enter the password for user bandit24 and the secret pincode on a single line, separated by a space.
+```
+so let's write a script for that. For permission purposes, we will do so in a new `/tmp/` directory.
+``` bash
+#!/bin/bash
+
+for a in {0..9}; do
+    for b in {0..9}; do
+        for c in {0..9}; do
+            for d in {0..9}; do
+                echo UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ $a$b$c$d | nc localhost 30002
+            done
+        done
+    done
+done
+```
+but this is inefficient and turns out bash will know to keep 4 digits if you say `0000`. So I used the principle behind [Effy Min's script](https://write.as/effyverse/bandit-lv-24-brute-force-password-script)
+``` bash
+#!/bash/bin
+
+for i in {0000..9999}; do
+       echo UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ $i | nc localhost 30002
+done
+```
+password: `uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG`
+
+#### level 26
+As promised, reaching level 26 is easy, since we used this exact method to get into bandit level 15:
+``` bash
+bandit25@bandit:~$ ssh -i bandit26.sshkey bandit26@localhost
+```
+the question is staying there...
+
+We know that all passwords are stored in `/etc/bandit_pass/banditXX` where `XX` is the level. Of course, the permissions to read said password is restricted to the level protected by the same password.
+
+So let's explore what else `/etc` has in terms on passwords:
+```bash
+bandit25@bandit:~$ ls -l /etc/ | grep pass
+drwxr-xr-x 2 root   root    4096 May  7  2020 bandit_pass
+-rw-r--r-- 1 root   root    3595 May  7  2020 passwd
+-rw------- 1 root   root    3579 May  7  2020 passwd-
+```
+That top one looks promising
+```bash
+bandit25@bandit:~$ cat /etc/passwd | grep bandit26
+bandit26:x:11026:11026:bandit level 26:/home/bandit26:/usr/bin/showtext
+bandit25@bandit:~$ cat /usr/bin/showtext
+#!/bin/sh
+
+export TERM=linux
+
+more ~/text.txt
+exit 0
+```
+There it is, when this script executes, it `exit` out of our `ssh` connection.
+
+Trying to pass a command with `ssh` doesn't work because the `/usr/bin/showtext` is being executed before hand.
+``` bash
+bandit25@bandit:/tmp/lemon$ ssh -t -i ~/bandit26.sshkey bandit26@localhost 'cat *'
+Could not create directory '/home/bandit25/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' cannot be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit25/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+  _                     _ _ _   ___   __  
+ | |                   | (_) | |__ \ / /  
+ | |__   __ _ _ __   __| |_| |_   ) / /_  
+ | '_ \ / _` | '_ \ / _` | | __| / / '_ \
+ | |_) | (_| | | | | (_| | | |_ / /| (_) |
+ |_.__/ \__,_|_| |_|\__,_|_|\__|____\___/
+Connection to localhost closed.'
+```
+Even changing from the default shell by passing `chsh` will not work.
+
+Clearly we are not going to solve this level at teh `ssh` stage. So we need to "attack" this different shell `bandit26` runs.  It is in fact the `showtext` above. Another way to get that hint is to look into what shells are available on the bandit server
+``` bash
+bandit25@bandit:/$ cat etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/dash
+/bin/bash
+/bin/rbash
+/usr/bin/screen
+/usr/bin/tmux
+/usr/bin/showtext
+```
+and confirm it is indeed `/usr/bin/showtext` by doing
+```bash
+bandit26:x:11026:11026:bandit level 26:/home/bandit26:/usr/bin/showtext
+```
