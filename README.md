@@ -492,7 +492,7 @@ Connection to localhost closed.'
 ```
 Even changing from the default shell by passing `chsh` will not work.
 
-Clearly we are not going to solve this level at teh `ssh` stage. So we need to "attack" this different shell `bandit26` runs.  It is in fact the `showtext` above. Another way to get that hint is to look into what shells are available on the bandit server
+Clearly we are not going to solve this level at the `ssh` stage. So we need to "attack" this different shell `bandit26` runs.  It is in fact the `showtext` above. Another way to get that hint is to look into what shells are available on the bandit server
 ``` bash
 bandit25@bandit:/$ cat etc/shells
 # /etc/shells: valid login shells
@@ -508,3 +508,4 @@ and confirm it is indeed `/usr/bin/showtext` by doing
 ```bash
 bandit26:x:11026:11026:bandit level 26:/home/bandit26:/usr/bin/showtext
 ```
+We cannot tell `bandit26` to use a different shell by changing that file without `root` access unfortunately.
