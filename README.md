@@ -512,7 +512,7 @@ We cannot tell `bandit26` to use a different shell by changing that file without
 
 :bangbang: SOMETHING SOMETHING ABOUT `more` being what is executed at launch, right before `exit` is sent. So let us suspend `more`, use `v` to switch to edit mode, then press `ESC` to execute any commands we want!
 
-#### level 27
+#### level 27 :bangbang:
  `Run a command as another user. Example: %s id`
 
  ``` bash
@@ -530,3 +530,75 @@ then
 3ba3118a22e93127a4ed485be72ef5ea
 ```
 password: `3ba3118a22e93127a4ed485be72ef5ea`
+
+#### level 28
+```bash
+bandit27@bandit:~$ mkdir /tmp/<your created tmp directory>/git
+bandit27@bandit:~$ git clone ssh://bandit27-git@localhost/home/bandit27-git/repo /tmp/lemon/git
+``` entering the password for `bandit27` and boom it works. Now we can read the password from the only file in that new directory.
+
+password: `0ef186ac70e04ea33b4c1853d2526fa2`
+
+#### level 29
+Same principle as before, but now we arrive at
+``` bash
+# Bandit Notes
+Some notes for level29 of bandit.
+
+## credentials
+
+- username: bandit29
+- password: xxxxxxxxxx
+```
+
+So let us see in the logs if there was a time where the `README.md` file had the password:
+``` bash
+bandit28@bandit:/tmp/lemon/repo$ git log
+commit edd935d60906b33f0619605abd1689808ccdd5ee
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu May 7 20:14:49 2020 +0200
+
+    fix info leak
+
+commit c086d11a00c0648d095d04c089786efef5e01264
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu May 7 20:14:49 2020 +0200
+
+    add missing data
+
+commit de2ebe2d5fd1598cd547f4d56247e053be3fdc38
+Author: Ben Dover <noone@overthewire.org>
+Date:   Thu May 7 20:14:49 2020 +0200
+
+    initial commit of README.md
+bandit28@bandit:/tmp/lemon/repo$ git checkout c086d11a00c0648d095d04c089786efef5e01264
+Note: checking out 'c086d11a00c0648d095d04c089786efef5e01264'.
+```
+Now revisiting `README.md` with get the password.
+
+password: `bbc96594b4e001778eee9975372716b2`
+
+#### level 30
+Similar to the above level, but this time we investigate branches
+``` bash
+bandit29@bandit:/tmp/lemon/repo$ git branch -a
+* (HEAD detached at 208f463)
+  master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/sploits-dev
+bandit29@bandit:/tmp/lemon/repo$ git checkout   remotes/origin/dev
+Previous HEAD position was 208f463... fix username
+HEAD is now at bc83328... add data needed for development
+bandit29@bandit:/tmp/lemon/repo$ cat README.md
+# Bandit Notes
+Some notes for bandit30 of bandit.
+
+## credentials
+
+- username: bandit30
+- password: 5b90576bedb2cc04c86a9e924ce42faf
+```
+
+password: `5b90576bedb2cc04c86a9e924ce42faf`
