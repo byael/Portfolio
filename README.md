@@ -509,3 +509,24 @@ and confirm it is indeed `/usr/bin/showtext` by doing
 bandit26:x:11026:11026:bandit level 26:/home/bandit26:/usr/bin/showtext
 ```
 We cannot tell `bandit26` to use a different shell by changing that file without `root` access unfortunately.
+
+:bangbang: SOMETHING SOMETHING ABOUT `more` being what is executed at launch, right before `exit` is sent. So let us suspend `more`, use `v` to switch to edit mode, then press `ESC` to execute any commands we want!
+
+#### level 27
+ `Run a command as another user. Example: %s id`
+
+ ``` bash
+ :! ~/bandit27-do                                                                                        
+[No write since last change]
+Run a command as another user.
+  Example: /home/bandit26/bandit27-do id
+
+shell returned 1
+```
+then
+``` bash
+:! ~/bandit27-do cat /etc/bandit_pass/bandit27
+[No write since last change]
+3ba3118a22e93127a4ed485be72ef5ea
+```
+password: `3ba3118a22e93127a4ed485be72ef5ea`
