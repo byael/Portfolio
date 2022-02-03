@@ -535,7 +535,8 @@ password: `3ba3118a22e93127a4ed485be72ef5ea`
 ```bash
 bandit27@bandit:~$ mkdir /tmp/<your created tmp directory>/git
 bandit27@bandit:~$ git clone ssh://bandit27-git@localhost/home/bandit27-git/repo /tmp/lemon/git
-``` entering the password for `bandit27` and boom it works. Now we can read the password from the only file in that new directory.
+```
+entering the password for `bandit27` and boom it works. Now we can read the password from the only file in that new directory.
 
 password: `0ef186ac70e04ea33b4c1853d2526fa2`
 
@@ -602,3 +603,38 @@ Some notes for bandit30 of bandit.
 ```
 
 password: `5b90576bedb2cc04c86a9e924ce42faf`
+
+#### level 31
+This time the `README.md` has the simple message
+```
+just an empty file...muahaha
+```
+Going through possible things you can do with `git` lands you investigating tags
+``` bash
+bandit30@bandit:/tmp/lemon$ git tag
+secret
+bandit30@bandit:/tmp/lemon$ git show secret
+47e603bb428404d265f59c42920d81e5
+```
+
+password: `47e603bb428404d265f59c42920d81e5`
+
+#### level 31
+Our new file now gives us clear instructions:
+```bash
+This time your task is to push a file to the remote repository.
+
+Details:
+    File name: key.txt
+    Content: 'May I come in?'
+    Branch: master
+```
+So let us do just that:
+```bash
+bandit31@bandit:/tmp/lemon/repo$ vim key.txt
+bandit31@bandit:/tmp/lemon/repo$ git add -f key.txt
+bandit31@bandit:/tmp/lemon/repo$ git push
+```
+password: `56a9bf19c63d650ce78e6ec0354ee45e`
+
+#### level 32
